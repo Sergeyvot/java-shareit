@@ -29,15 +29,15 @@ public class BookingStorageImpl implements BookingStorage {
     public Booking addNewBooking(User user, Item item, BookingDto bookingDto) {
         Booking booking = bookingMapper.toBooking(bookingDto);
         long bookingId = ++id;
-        booking.toBuilder()
+        Booking newBooking = booking.toBuilder()
                 .bookingId(bookingId)
                 .booker(user)
                 .item(item)
                 .status(Status.WAITING).build();
-        bookings.put(bookingId, booking);
+        bookings.put(bookingId, newBooking);
         log.info("Вещь с Id {} забронирована пользователем с id {}", booking.getItem().getId(),
                 booking.getBooker().getId());
-        return booking;
+        return newBooking;
     }
 
     @Override
@@ -56,11 +56,12 @@ public class BookingStorageImpl implements BookingStorage {
             if (bookings.get(bookingId).getBooker().getId() == user.getId() ||
                     bookings.get(bookingId).getItem().getOwner().getId() == user.getId()) {
                 Booking booking = bookingMapper.toBooking(bookingDto);
-                booking.toBuilder()
+                Booking updateBooking = booking.toBuilder()
                         .bookingId(bookingId)
                         .booker(bookings.get(bookingId).getBooker())
                         .item(bookings.get(bookingId).getItem()).build();
-                bookings.put(bookingId, booking);
+                bookings.put(bookingId, updateBooking);
+                return updateBooking;
             } else {
                 log.error("Id пользователя {} не совпадает с id автора бронирования {} и id владельца вещи {}.",
                         user.getId(), bookings.get(bookingId).getBooker().getId(),
@@ -75,7 +76,6 @@ public class BookingStorageImpl implements BookingStorage {
             throw new BookingNotFoundException(String.format("Бронирования с id %d не зарегистрировано "
                     + "в базе приложения.", bookingId));
         }
-        return null;
     }
 
     @Override
