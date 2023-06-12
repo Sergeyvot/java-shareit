@@ -28,6 +28,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         this.userService = userService;
         this.userMapper = userMapper;
     }
+
     @Override
     public ItemRequest addNewRequest(long userId, ItemRequestDto itemRequestDto) {
         User user = userMapper.toUser(userService.findUserById(userId));

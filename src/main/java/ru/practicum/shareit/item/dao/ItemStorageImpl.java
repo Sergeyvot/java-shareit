@@ -59,8 +59,8 @@ public class ItemStorageImpl implements ItemStorage {
             } else {
                 log.error("Id пользователя {} не совпадает с id владельца вещи {}.",
                         userId, items.get(itemId).getOwner().getId());
-                throw new UserNotFoundException(String.format("Редактировать вещь c id %d может только ее владелец с id %d"
-                        , itemId, items.get(itemId).getOwner().getId()));
+                throw new UserNotFoundException(String.format("Редактировать вещь c id %d может только ее владелец "
+                        + "с id %d", itemId, items.get(itemId).getOwner().getId()));
             }
         } else {
             log.error("Передан некорректный id вещи: {}", itemId);
