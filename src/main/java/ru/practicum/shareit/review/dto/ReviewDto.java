@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.review.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -7,23 +7,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
-public class ItemRequestDto {
+public class ReviewDto {
 
-    @JsonProperty("description")
+    @JsonProperty("content")
     @NotNull
     @Size(max = 255)
-    private String description;
-    @JsonProperty("created")
+    String content;
+    @JsonProperty("positive")
     @NotNull
-    private LocalDateTime created;
+    boolean positive;
+    @JsonProperty("userId")
+    @PositiveOrZero
+    long userId;
+    @JsonProperty("itemId")
+    @PositiveOrZero
+    long itemId;
 }
