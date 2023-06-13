@@ -15,7 +15,7 @@ public interface BookingStorage {
 
     void deleteAllBookings();
 
-    Booking updateBookingByBooker(long bookingId, User booker, Item item, BookingDto bookingDto);
+    Booking updateBookingByBooker(long bookingId, User booker, BookingDto bookingDto);
 
     Collection<BookingDto> getAllBookings();
 

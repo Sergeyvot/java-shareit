@@ -19,14 +19,14 @@ public class ReviewDto {
     @JsonProperty("content")
     @NotNull
     @Size(max = 255)
-    String content;
+    private String content;
     @JsonProperty("positive")
     @NotNull
-    boolean positive;
+    private boolean positive;
     @JsonProperty("userId")
     @PositiveOrZero
-    long userId;
+    private long userId;
     @JsonProperty("itemId")
     @PositiveOrZero
-    long itemId;
+    private long itemId;
 }

@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -81,6 +80,7 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public Collection<UserDto> getAllUsers() {
+        log.info("Запрошен список всех пользователей приложения");
         return users.values().stream()
                 .map(user -> userMapper.toUserDto(user))
                 .collect(Collectors.toList());
@@ -119,10 +119,9 @@ public class UserStorageImpl implements UserStorage {
     }
 
     private void checkDuplicateEmailUser(String email) {
-        List<User> checkUsers = users.values().stream()
-                .filter(u -> u.getEmail().equals(email))
-                .collect(Collectors.toList());
-        if (!checkUsers.isEmpty()) {
+        boolean checkUsers = users.values().stream()
+                .anyMatch(u -> u.getEmail().equals(email));
+        if (checkUsers) {
             log.error("Адрес электронной почты {} уже есть в приложении.", email);
             throw new DuplicateEmailUserException(String.format("Пользователь с электронной почтой %s уже зарегистрирован "
                     + "в приложении", email));

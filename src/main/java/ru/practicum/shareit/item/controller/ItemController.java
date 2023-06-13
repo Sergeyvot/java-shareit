@@ -1,12 +1,10 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -19,11 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
-
-    @Autowired
-    public ItemController(ItemServiceImpl itemService) {
-        this.itemService = itemService;
-    }
 
     @PostMapping
     public Item addNewItem(@RequestHeader("X-Sharer-User-Id") Long userId,

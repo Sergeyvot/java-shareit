@@ -123,8 +123,9 @@ public class ItemStorageImpl implements ItemStorage {
             throw new ValidationException("Описание вещи не может быть пустым");
         }
         if (itemDto.getAvailable() == null) {
-            log.error("Не передан статус вещи");
-            throw new ValidationException("Статус вещи не может быть пустым");
+            log.error("Доступность вещи не указана");
+            throw new ValidationException("При создании вещи должна быть указана ее доступность. "
+                    + "Поле не может быть пустым");
         }
         return itemDto;
     }

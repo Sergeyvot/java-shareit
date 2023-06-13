@@ -79,6 +79,7 @@ public class ItemRequestStorageImpl implements ItemRequestStorage {
 
     @Override
     public Collection<ItemRequestDto> getAllRequests() {
+        log.info("Запрошен список всех запросов приложения");
         return itemRequests.values().stream()
                 .map(i -> requestMapper.toItemRequestDto(i))
                 .collect(Collectors.toList());

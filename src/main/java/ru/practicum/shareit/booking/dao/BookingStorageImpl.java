@@ -51,7 +51,7 @@ public class BookingStorageImpl implements BookingStorage {
     }
 
     @Override
-    public Booking updateBookingByBooker(long bookingId, User user, Item item, BookingDto bookingDto) {
+    public Booking updateBookingByBooker(long bookingId, User user, BookingDto bookingDto) {
         if (bookings.containsKey(bookingId)) {
             if (bookings.get(bookingId).getBooker().getId() == user.getId() ||
                     bookings.get(bookingId).getItem().getOwner().getId() == user.getId()) {
@@ -61,6 +61,8 @@ public class BookingStorageImpl implements BookingStorage {
                         .booker(bookings.get(bookingId).getBooker())
                         .item(bookings.get(bookingId).getItem()).build();
                 bookings.put(bookingId, updateBooking);
+                log.info("Бронирование веши с Id {} отредактировано пользователем с id {}", booking.getItem().getId(),
+                        user.getId());
                 return updateBooking;
             } else {
                 log.error("Id пользователя {} не совпадает с id автора бронирования {} и id владельца вещи {}.",
