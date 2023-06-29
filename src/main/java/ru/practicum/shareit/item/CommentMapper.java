@@ -7,6 +7,9 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.dao.UserRepository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Component
 public class CommentMapper {
 
@@ -23,8 +26,8 @@ public class CommentMapper {
     public Comment toComment(Long authorId, Long itemId, CommentDto commentDto) {
         Comment.CommentBuilder comment = Comment.builder();
 
-        if ( commentDto.getId() != null ) {
-            comment.id( commentDto.getId() );
+        if (commentDto.getId() != null) {
+            comment.id(commentDto.getId());
         }
         comment.text(commentDto.getText());
         comment.item(repository.findById(itemId).get());
@@ -39,7 +42,7 @@ public class CommentMapper {
         commentDto.id(comment.getId());
         commentDto.text(comment.getText());
         commentDto.authorName(comment.getAuthor().getName());
-        commentDto.created(comment.getCreated());
+        commentDto.created(LocalDateTime.ofInstant(comment.getCreated(), ZoneId.systemDefault()));
 
         return commentDto.build();
     }

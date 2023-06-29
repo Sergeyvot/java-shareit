@@ -27,8 +27,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.booker.id = ?1 order by b.start desc")
     List<Booking> findByBookerId(Long userId);
 
-    @Query(value = "select b.* from bookings as b "+
-            "left join items as it on b.item_id = it.id "+
+    @Query(value = "select b.* from bookings as b " +
+            "left join items as it on b.item_id = it.id " +
             "where it.owner_id = ?1 and b.status = concat('', ?2, '') order by b.start_date desc", nativeQuery = true)
     List<Booking> findAllByOwner_IdByStatus(Long userId, String status);
 

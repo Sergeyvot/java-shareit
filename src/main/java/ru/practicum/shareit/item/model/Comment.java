@@ -4,7 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "comments", schema = "public")
@@ -25,7 +25,7 @@ public class Comment {
     @JoinColumn(name = "author_id")
     @ToString.Exclude
     User author;
-    LocalDateTime created;
+    Instant created;
 
     @Override
     public boolean equals(Object o) {

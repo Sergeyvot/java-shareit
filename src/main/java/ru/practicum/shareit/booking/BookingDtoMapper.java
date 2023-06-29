@@ -20,12 +20,12 @@ public class BookingDtoMapper {
     public Booking toBooking(BookingDto bookingDto) {
         Booking.BookingBuilder booking = Booking.builder();
 
-        if ( bookingDto.getId() != null ) {
-            booking.id( bookingDto.getId() );
+        if (bookingDto.getId() != null) {
+            booking.id(bookingDto.getId());
         }
         booking.start(bookingDto.getStart().toInstant(OffsetDateTime.now().getOffset()));
         booking.end(bookingDto.getEnd().toInstant(OffsetDateTime.now().getOffset()));
-        if ( bookingDto.getStatus() != null ) {
+        if (bookingDto.getStatus() != null) {
             booking.status(Status.valueOf(bookingDto.getStatus()));
         }
         booking.item(repository.findById(bookingDto.getItemId()).get());

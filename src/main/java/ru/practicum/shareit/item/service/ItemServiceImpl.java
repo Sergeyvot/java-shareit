@@ -107,7 +107,7 @@ public class ItemServiceImpl implements ItemService {
                 .anyMatch(b -> b.getBooker().getId() == userId && b.getEnd().isBefore(Instant.now()))) {
             Comment comment = commentMapper.toComment(userId, itemId, commentDto);
             Comment newComment = comment.toBuilder()
-                    .created(LocalDateTime.now()).build();
+                    .created(LocalDateTime.now().toInstant(OffsetDateTime.now().getOffset())).build();
             log.info("Пользователь с id {} оставил отзыв о вещи с id {}", userId, itemId);
             return commentMapper.toCommentDto(commentRepository.save(newComment));
         } else {
