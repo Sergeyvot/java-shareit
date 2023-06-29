@@ -1,36 +1,31 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Entity
-@Table(name = "items", schema = "public")
+@Table(name = "comments", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder(toBuilder = true)
-public class Item {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String name;
-    String description;
-    @Column(name = "is_available")
-    boolean available;
+    String text;
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "item_id")
     @ToString.Exclude
-    User owner;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id")
+    Item item;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
     @ToString.Exclude
-    ItemRequest request;
+    User author;
+    LocalDateTime created;
 
     @Override
     public boolean equals(Object o) {

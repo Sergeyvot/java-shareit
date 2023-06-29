@@ -11,14 +11,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Getter
-public class BookingDto {
+public class BookingDtoItem {
+
     @JsonProperty("id")
     private Long id;
     @JsonProperty("start")
@@ -28,6 +26,10 @@ public class BookingDto {
     @JsonProperty("end")
     @NotNull
     private LocalDateTime end;
+    @JsonProperty("bookerId")
+    @NotNull
+    @PositiveOrZero
+    private long bookerId;
     @JsonProperty("itemId")
     @NotNull
     @PositiveOrZero

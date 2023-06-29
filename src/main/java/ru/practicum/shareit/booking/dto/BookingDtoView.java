@@ -5,20 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Getter
-public class BookingDto {
+public class BookingDtoView {
+
     @JsonProperty("id")
     private Long id;
     @JsonProperty("start")
@@ -28,10 +27,12 @@ public class BookingDto {
     @JsonProperty("end")
     @NotNull
     private LocalDateTime end;
-    @JsonProperty("itemId")
+    @JsonProperty("booker")
     @NotNull
-    @PositiveOrZero
-    private long itemId;
+    private User booker;
+    @JsonProperty("item")
+    @NotNull
+    private Item item;
     @JsonProperty("status")
     @NotNull
     private String status;

@@ -29,7 +29,7 @@ public class ItemRequestStorageImpl implements ItemRequestStorage {
         ItemRequest itemRequest = requestMapper.toItemRequest(itemRequestDto);
         long requestId = ++id;
         ItemRequest newRequest = itemRequest.toBuilder()
-                .requestId(requestId)
+                .id(requestId)
                 .requestor(user).build();
         itemRequests.put(requestId, newRequest);
         log.info("В приложение добавлен запрос с id {}", requestId);
@@ -61,7 +61,7 @@ public class ItemRequestStorageImpl implements ItemRequestStorage {
                 ItemRequest updateRequest = request.toBuilder()
                         .description(itemRequestDto.getDescription())
                         .created(itemRequestDto.getCreated()).build();
-                itemRequests.put(updateRequest.getRequestId(), updateRequest);
+                itemRequests.put(updateRequest.getId(), updateRequest);
                 log.info("Обновлен запрос с id {}", requestId);
                 return updateRequest;
             } else {

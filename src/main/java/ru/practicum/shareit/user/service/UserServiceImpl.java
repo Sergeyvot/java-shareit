@@ -1,50 +1,109 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dao.UserStorage;
-import ru.practicum.shareit.user.dao.UserStorageImpl;
+import ru.practicum.shareit.exception.DuplicateEmailUserException;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository repository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserStorageImpl userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository repository, UserMapper userMapper) {
+        this.repository = repository;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public Collection<UserDto> findAllUsers() {
-        return userStorage.getAllUsers();
+    public List<UserDto> findAllUsers() {
+        List<User> users = repository.findAll();
+        log.info("Запрошен список всех пользователей приложения");
+        return users.stream()
+                .map(userMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public UserDto findUserById(long id) {
-        return userStorage.findUserById(id);
+        User user = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован "
+                        + "в базе приложения.", id)));
+        log.info("Запрошен пользователь с id {}. Данные получены", id);
+        return userMapper.toUserDto(user);
     }
 
     @Override
-    public User createUser(UserDto userDto) {
-        return userStorage.addUser(userDto);
+    public UserDto createUser(UserDto userDto) {
+        checkValidationUser(userDto);
+
+        User user = repository.save(userMapper.toUser(userDto));
+
+        log.info("Добавлен пользователь с id {}", user.getId());
+        return userMapper.toUserDto(user);
     }
 
     @Override
-    public User updateUser(long userId, UserDto userDto) {
-        return userStorage.updateUser(userId, userDto);
+    public UserDto updateUser(long userId, UserDto userDto) {
+        UserDto user = this.findUserById(userId);
+        if (!user.getEmail().equals(userDto.getEmail())) {
+            checkDuplicateEmailUser(userDto.getEmail());
+        }
+        UserDto updateUser = user.toBuilder()
+                .name(userDto.getName() != null ? userDto.getName() : user.getName())
+                .email(userDto.getEmail() != null ? userDto.getEmail() : user.getEmail()).build();
+        log.info("Обновлен пользователь с id {}", userId);
+        return userMapper.toUserDto(repository.save(userMapper.toUser(updateUser)));
     }
 
     @Override
     public void removeUser(long id) {
-        userStorage.removeUser(id);
+        repository.deleteById(id);
+        log.info("Удален пользователь с id {}", id);
     }
 
     @Override
     public void deleteAllUsers() {
-        userStorage.deleteAllUsers();
+        repository.deleteAll();
+        log.info("Удалены все пользователи приложения");
+    }
+
+    private UserDto checkValidationUser(UserDto userDto) throws ValidationException {
+
+        if (userDto == null) {
+            log.error("Передано пустое тело запроса");
+            throw new ValidationException("Тело запроса не может быть пустым.");
+        }
+        if (StringUtils.isBlank(userDto.getEmail())) {
+            log.error("Передан некорректный адрес электронной почты: {}", userDto.getEmail());
+            throw new ValidationException("Адрес электронной почты не может быть пустым");
+        }
+        if (StringUtils.containsNone(userDto.getEmail(), "@")) {
+            log.error("Передан некорректный адрес электронной почты: {}", userDto.getEmail());
+            throw new ValidationException("Адрес электронной почты должен содержать символ @");
+        }
+        return userDto;
+    }
+
+    private void checkDuplicateEmailUser(String email) {
+        Optional<User> checkUser = repository.findByEmailContainingIgnoreCase(email);
+        if (checkUser.isPresent()) {
+            log.error("Адрес электронной почты {} уже есть в приложении.", email);
+            throw new DuplicateEmailUserException(String.format("Пользователь с электронной "
+                    + "почтой %s уже зарегистрирован в приложении", email));
+        }
     }
 }

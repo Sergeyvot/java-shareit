@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.dao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.booking.BookingDtoMapper;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,6 +16,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Repository
 @Slf4j
@@ -22,15 +24,16 @@ public class BookingStorageImpl implements BookingStorage {
 
     @Autowired
     private BookingMapper bookingMapper;
+    private BookingDtoMapper bookingDtoMapper;
     private final Map<Long, Booking> bookings = new HashMap<>();
     private long id;
 
     @Override
     public Booking addNewBooking(User user, Item item, BookingDto bookingDto) {
-        Booking booking = bookingMapper.toBooking(bookingDto);
+        Booking booking = bookingDtoMapper.toBooking(bookingDto);
         long bookingId = ++id;
         Booking newBooking = booking.toBuilder()
-                .bookingId(bookingId)
+                .id(bookingId)
                 .booker(user)
                 .item(item)
                 .status(Status.WAITING).build();
@@ -53,11 +56,11 @@ public class BookingStorageImpl implements BookingStorage {
     @Override
     public Booking updateBookingByBooker(long bookingId, User user, BookingDto bookingDto) {
         if (bookings.containsKey(bookingId)) {
-            if (bookings.get(bookingId).getBooker().getId() == user.getId() ||
-                    bookings.get(bookingId).getItem().getOwner().getId() == user.getId()) {
-                Booking booking = bookingMapper.toBooking(bookingDto);
+            if (Objects.equals(bookings.get(bookingId).getBooker().getId(), user.getId()) ||
+                    Objects.equals(bookings.get(bookingId).getItem().getOwner().getId(), user.getId())) {
+                Booking booking = bookingDtoMapper.toBooking(bookingDto);
                 Booking updateBooking = booking.toBuilder()
-                        .bookingId(bookingId)
+                        .id(bookingId)
                         .booker(bookings.get(bookingId).getBooker())
                         .item(bookings.get(bookingId).getItem()).build();
                 bookings.put(bookingId, updateBooking);
