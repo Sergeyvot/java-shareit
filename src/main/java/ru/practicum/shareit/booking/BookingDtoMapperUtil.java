@@ -11,7 +11,6 @@ import java.time.OffsetDateTime;
 public final class BookingDtoMapperUtil {
 
     private BookingDtoMapperUtil() {
-
     }
 
     public static Booking toBooking(BookingDto bookingDto, Item item) {
