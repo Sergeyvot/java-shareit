@@ -10,9 +10,7 @@ import java.time.OffsetDateTime;
 @Component
 public final class BookingDtoMapperUtil {
 
-    private BookingDtoMapperUtil() {
-
-    }    
+    private BookingDtoMapperUtil() {}
 
     public static Booking toBooking(BookingDto bookingDto, Item item) {
         Booking.BookingBuilder booking = Booking.builder();

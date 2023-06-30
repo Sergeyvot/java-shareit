@@ -12,9 +12,7 @@ import java.time.ZoneId;
 @Component
 public final class CommentMapperUtil {
 
-    private CommentMapperUtil() {
-        
-    }
+    private CommentMapperUtil() {}
 
     public static Comment toComment(User author, Item item, CommentDto commentDto) {
         Comment.CommentBuilder comment = Comment.builder();
