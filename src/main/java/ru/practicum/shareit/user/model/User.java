@@ -16,10 +16,10 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
+    private Long id;
+    private String name;
     @Column(name = "email", unique = true)
-    String email;
+    private String email;
 
     @Override
     public boolean equals(Object o) {

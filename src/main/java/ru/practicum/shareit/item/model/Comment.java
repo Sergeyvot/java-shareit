@@ -15,17 +15,17 @@ import java.time.Instant;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String text;
+    private Long id;
+    private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
     @ToString.Exclude
-    Item item;
+    private Item item;
     @ManyToOne
     @JoinColumn(name = "author_id")
     @ToString.Exclude
-    User author;
-    Instant created;
+    private User author;
+    private Instant created;
 
     @Override
     public boolean equals(Object o) {

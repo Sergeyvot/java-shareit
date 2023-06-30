@@ -20,19 +20,19 @@ import java.time.Instant;
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @Column(name = "start_date")
-    Instant start;
+    private Instant start;
     @Column(name = "end_date")
-    Instant end;
+    private Instant end;
     @ManyToOne
     @JoinColumn(name = "item_id")
     @ToString.Exclude
-    Item item;
+    private Item item;
     @ManyToOne
     @JoinColumn(name = "booker_id")
     @ToString.Exclude
-    User booker;
+    private User booker;
     @Enumerated(EnumType.STRING)
-    Status status;
+    private Status status;
 }

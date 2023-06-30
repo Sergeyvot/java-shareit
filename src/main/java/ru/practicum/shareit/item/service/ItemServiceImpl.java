@@ -1,8 +1,8 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingDtoItemMapper;
 import ru.practicum.shareit.booking.Status;
@@ -10,7 +10,7 @@ import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.CommentMapper;
+import ru.practicum.shareit.item.CommentMapperUtil;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
@@ -22,7 +22,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -33,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final BookingRepository bookingRepository;
@@ -40,23 +40,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final ItemMapper itemMapper;
-    private final CommentMapper commentMapper;
     private final BookingDtoItemMapper bookingDtoItemMapper;
-
-    @Autowired
-    public ItemServiceImpl(ItemRepository repository, BookingRepository bookingRepository,
-                           CommentRepository commentRepository, UserServiceImpl userService,
-                           UserMapper userMapper, ItemMapper itemMapper, CommentMapper commentMapper,
-                           BookingDtoItemMapper bookingDtoItemMapper) {
-        this.repository = repository;
-        this.bookingRepository = bookingRepository;
-        this.commentRepository = commentRepository;
-        this.userService = userService;
-        this.userMapper = userMapper;
-        this.itemMapper = itemMapper;
-        this.commentMapper = commentMapper;
-        this.bookingDtoItemMapper = bookingDtoItemMapper;
-    }
 
     @Override
     public ItemDto addNewItem(long userId, ItemDto itemDto) {
@@ -105,11 +89,11 @@ public class ItemServiceImpl implements ItemService {
         }
         if (bookingRepository.findAllByItemId(itemId).stream()
                 .anyMatch(b -> b.getBooker().getId() == userId && b.getEnd().isBefore(Instant.now()))) {
-            Comment comment = commentMapper.toComment(userId, itemId, commentDto);
+            Comment comment = CommentMapperUtil.toComment(user, item, commentDto);
             Comment newComment = comment.toBuilder()
                     .created(LocalDateTime.now().toInstant(OffsetDateTime.now().getOffset())).build();
             log.info("Пользователь с id {} оставил отзыв о вещи с id {}", userId, itemId);
-            return commentMapper.toCommentDto(commentRepository.save(newComment));
+            return CommentMapperUtil.toCommentDto(commentRepository.save(newComment));
         } else {
             log.error("Оставлять отзывы может только пользователь, уже бравший данную вещь в аренду. "
                     + "id пользователя {}, сделавшего запрос, не совпадает.", userId);
@@ -142,16 +126,16 @@ public class ItemServiceImpl implements ItemService {
                         .map(bookingDtoItemMapper::toBookingDtoItem)
                         .findFirst().orElse(null))
                 .comments(commentRepository.findAllByItemId(item.getId()).stream()
-                        .map(commentMapper::toCommentDto)
+                        .map(CommentMapperUtil::toCommentDto)
                         .collect(Collectors.toList())).build();
     }
 
     @Override
     public Item findEntityById(long itemId) {
-        Item item = repository.findById(itemId)
+
+        return repository.findById(itemId)
                 .orElseThrow(() -> new ItemNotFoundException(String.format("Вещь с id %d не зарегистрирована "
                         + "в приложении.", itemId)));
-        return item;
     }
 
     @Override
@@ -174,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
                                 .map(bookingDtoItemMapper::toBookingDtoItem)
                                 .findFirst().orElse(null))
                         .comments(commentRepository.findAllByItemId(i.getId()).stream()
-                                .map(commentMapper::toCommentDto)
+                                .map(CommentMapperUtil::toCommentDto)
                                 .collect(Collectors.toList())).build())
                 .collect(Collectors.toList());
     }
@@ -191,7 +175,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    private ItemDto checkValidationItem(ItemDto itemDto) throws ValidationException {
+    private void checkValidationItem(ItemDto itemDto) throws ValidationException {
 
         if (itemDto == null) {
             log.error("Передано пустое тело запроса");
@@ -210,6 +194,5 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("При создании вещи должна быть указана ее доступность. "
                     + "Поле не может быть пустым");
         }
-        return itemDto;
     }
 }

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,20 +18,15 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @Getter
 public class BookingDto {
-    @JsonProperty("id")
     private Long id;
-    @JsonProperty("start")
     @NotNull
     @FutureOrPresent
     private LocalDateTime start;
-    @JsonProperty("end")
     @NotNull
     private LocalDateTime end;
-    @JsonProperty("itemId")
     @NotNull
     @PositiveOrZero
     private long itemId;
-    @JsonProperty("status")
     @NotNull
     private String status;
 }

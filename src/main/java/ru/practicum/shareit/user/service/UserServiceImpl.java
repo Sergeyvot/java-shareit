@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
         log.info("Удалены все пользователи приложения");
     }
 
-    private UserDto checkValidationUser(UserDto userDto) throws ValidationException {
+    private void checkValidationUser(UserDto userDto) throws ValidationException {
 
         if (userDto == null) {
             log.error("Передано пустое тело запроса");
@@ -95,7 +95,6 @@ public class UserServiceImpl implements UserService {
             log.error("Передан некорректный адрес электронной почты: {}", userDto.getEmail());
             throw new ValidationException("Адрес электронной почты должен содержать символ @");
         }
-        return userDto;
     }
 
     private void checkDuplicateEmailUser(String email) {

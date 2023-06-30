@@ -18,19 +18,19 @@ import javax.persistence.*;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
-    String description;
+    private Long id;
+    private String name;
+    private String description;
     @Column(name = "is_available")
-    boolean available;
+    private boolean available;
     @ManyToOne
     @JoinColumn(name = "owner_id")
     @ToString.Exclude
-    User owner;
+    private User owner;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     @ToString.Exclude
-    ItemRequest request;
+    private ItemRequest request;
 
     @Override
     public boolean equals(Object o) {

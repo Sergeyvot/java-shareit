@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,17 +17,12 @@ import javax.validation.constraints.Size;
 @Builder(toBuilder = true)
 @Getter
 public class ItemDto {
-    @JsonProperty("id")
     @PositiveOrZero
     private long id;
-    @JsonProperty("name")
     @NotBlank
     private String name;
-    @JsonProperty("description")
     @Size(max = 1000)
     private String description;
-    @JsonProperty("available")
     private Boolean available;
-    @JsonProperty("requestId")
     private Long requestId;
 }
