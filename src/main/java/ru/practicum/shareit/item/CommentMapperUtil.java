@@ -13,6 +13,7 @@ import java.time.ZoneId;
 public final class CommentMapperUtil {
 
     private CommentMapperUtil() {
+        
     }
 
     public static Comment toComment(User author, Item item, CommentDto commentDto) {
