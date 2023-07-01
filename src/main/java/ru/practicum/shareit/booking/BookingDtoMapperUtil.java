@@ -7,7 +7,6 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.time.OffsetDateTime;
 
-@Component
 public final class BookingDtoMapperUtil {
 
     private BookingDtoMapperUtil() {
