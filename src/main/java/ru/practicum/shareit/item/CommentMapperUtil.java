@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-@Component
 public final class CommentMapperUtil {
 
     private CommentMapperUtil() {
