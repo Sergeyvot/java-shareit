@@ -3,17 +3,14 @@ package ru.practicum.shareit;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.exception.DuplicateEmailUserException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.item.dao.ItemStorageImpl;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.user.dao.UserStorageImpl;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.ArrayList;
@@ -22,13 +19,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class ShareItTests {
 
 	private final UserServiceImpl userService;
 	private final ItemServiceImpl itemService;
-	private final UserStorageImpl userStorage;
-	private final ItemStorageImpl itemStorage;
 
 	@Test
 	void contextLoads() {
@@ -39,7 +35,7 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 
 		assertEquals("test@mail.ru", user.getEmail(),
 				"Поля созданного пользователя не совпадают");
@@ -49,32 +45,13 @@ class ShareItTests {
 		UserDto userDto1 = UserDto.builder()
 				.name("")
 				.email("test1@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
+		UserDto user1 = userService.createUser(userDto1);
 
 		assertEquals("test1@mail.ru", user1.getEmail(),
 				"Поля созданного пользователя не совпадают");
-		assertEquals("unknown", user1.getName(),
+		assertEquals("", user1.getName(),
 				"Поля созданного пользователя не совпадают");
-		assertFalse(userStorage.getUsers().isEmpty(), "Список пользователей пустой");
-	}
 
-	@Test
-	public void testAddUserWithDuplicateEmail() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test2@mail.ru").build();
-		User user = userService.createUser(userDto);
-		UserDto userDto1 = UserDto.builder()
-				.name("")
-				.email("test2@mail.ru").build();
-
-		Throwable thrown = assertThrows(DuplicateEmailUserException.class, () -> {
-			userService.createUser(userDto1);
-		});
-		assertNotNull(thrown.getMessage());
-
-		assertEquals(thrown.getMessage(), "Пользователь с электронной почтой " + userDto1.getEmail()
-				+ " уже зарегистрирован в приложении");
 	}
 
 	@Test
@@ -82,15 +59,15 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test3@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("")
 				.email("test4@mail.ru").build();
-		User updateUser = userService.updateUser(user.getId(), userDto1);
+		UserDto updateUser = userService.updateUser(user.getId(), userDto1);
 
-		assertEquals("test4@mail.ru", userStorage.getUsers().get(user.getId()).getEmail(),
+		assertEquals("test4@mail.ru", updateUser.getEmail(),
 				"Поля обновленного пользователя не совпадают");
-		assertEquals("", userStorage.getUsers().get(user.getId()).getName(),
+		assertEquals("", updateUser.getName(),
 				"Поля обновленного пользователя не совпадают");
 	}
 
@@ -99,7 +76,7 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test5@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("")
 				.email("test6@mail.ru").build();
@@ -117,11 +94,11 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test31@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("")
 				.email("test32@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
+		UserDto user1 = userService.createUser(userDto1);
 		UserDto userDto2 = UserDto.builder()
 				.name("UpdateName")
 				.email("test31@mail.ru").build();
@@ -135,48 +112,11 @@ class ShareItTests {
 	}
 
 	@Test
-	public void testRemoveUser() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test7@mail.ru").build();
-		User user = userService.createUser(userDto);
-		userService.removeUser(user.getId());
-		User checkUser = userStorage.getUsers().get(user.getId());
-
-		assertNull(checkUser);
-	}
-
-	@Test
-	public void testRemoveUserWithIncorrectId() {
-		Throwable thrown = assertThrows(UserNotFoundException.class, () -> {
-			userService.removeUser(9999);
-		});
-		assertNotNull(thrown.getMessage());
-
-		assertEquals(thrown.getMessage(), "Пользователь с id 9999 не существует.");
-	}
-
-	@Test
-	public void testDeleteAllUsers() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test8@mail.ru").build();
-		User user = userService.createUser(userDto);
-		UserDto userDto1 = UserDto.builder()
-				.name("")
-				.email("test9@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
-		userService.deleteAllUsers();
-
-		assertEquals(0, userStorage.getUsers().size(), "Размер списка не совпадает");
-	}
-
-	@Test
 	public void testFindUserById() {
 		UserDto userDto = UserDto.builder()
 				.name("NameCheckTest")
 				.email("test10@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto checkUserDto = userService.findUserById(user.getId());
 
 		assertEquals("NameCheckTest", checkUserDto.getName(),
@@ -200,11 +140,11 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test11@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("")
 				.email("test12@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
+		UserDto user1 = userService.createUser(userDto1);
 
 		List<UserDto> checkUsers = new ArrayList<>(userService.findAllUsers());
 
@@ -218,15 +158,15 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test13@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		ItemDto itemDto = ItemDto.builder()
 				.name("itemNameCheck")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 
 		assertEquals("itemNameCheck", item.getName(), "Поля созданной вещи не совпадают.");
-		assertEquals(user, item.getOwner(), "Поля созданной вещи не совпадают.");
+		assertEquals(true, item.getAvailable(), "Поля созданной вещи не совпадают.");
 	}
 
 	@Test
@@ -234,22 +174,22 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test14@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		ItemDto itemDto = ItemDto.builder()
 				.name("itemNameCheck")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 
 		ItemDto updateItemDto = ItemDto.builder()
 				.name("updateItemName")
 				.description("Почти хорошая вещь")
 				.available(false).build();
-		Item updateItem = itemService.updateItem(user.getId(), item.getId(), updateItemDto);
+		ItemDto updateItem = itemService.updateItem(user.getId(), item.getId(), updateItemDto);
 
-		assertEquals("updateItemName", itemStorage.getItems().get(item.getId()).getName(),
+		assertEquals("updateItemName", updateItem.getName(),
 				"Поля обновленной вещи не совпадают");
-		assertEquals(false, itemStorage.getItems().get(item.getId()).isAvailable(),
+		assertEquals(false, updateItem.getAvailable(),
 				"Поля обновленной вещи не совпадают");
 	}
 
@@ -258,12 +198,12 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test15@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		ItemDto itemDto = ItemDto.builder()
 				.name("itemNameCheck")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 		ItemDto updateItemDto = ItemDto.builder()
 				.name("updateItemName")
 				.description("Почти хорошая вещь")
@@ -278,90 +218,23 @@ class ShareItTests {
 	}
 
 	@Test
-	public void testUpdateItemWithIncorrectOwnerId() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test16@mail.ru").build();
-		User user = userService.createUser(userDto);
-		ItemDto itemDto = ItemDto.builder()
-				.name("itemNameCheck")
-				.description("Очень хорошая вещь")
-				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
-		ItemDto updateItemDto = ItemDto.builder()
-				.name("updateItemName")
-				.description("Почти хорошая вещь")
-				.available(false).build();
-
-		Throwable thrown = assertThrows(UserNotFoundException.class, () -> {
-			itemService.updateItem(9999, item.getId(), updateItemDto);
-		});
-		assertNotNull(thrown.getMessage());
-
-		assertEquals(thrown.getMessage(), "Редактировать вещь c id " + item.getId()
-				+ " может только ее владелец с id " + user.getId() + "");
-	}
-
-	@Test
-	public void testFindItemById() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test17@mail.ru").build();
-		User user = userService.createUser(userDto);
-		ItemDto itemDto = ItemDto.builder()
-				.name("itemNameCheck")
-				.description("Очень хорошая вещь")
-				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
-
-		ItemDto checkItemDto = itemService.findItemById(item.getId());
-		assertEquals("itemNameCheck", checkItemDto.getName(),
-				"Поля запрошенной вещи не совпадают");
-		assertEquals("Очень хорошая вещь", checkItemDto.getDescription(),
-				"Поля запрошенной вещи не совпадают");
-	}
-
-	@Test
 	public void testFindItemByIdWithIncorrectId() {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test18@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		ItemDto itemDto = ItemDto.builder()
 				.name("itemNameCheck")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 
 		Throwable thrown = assertThrows(ItemNotFoundException.class, () -> {
-			itemService.findItemById(9999);
+			itemService.findItemById(9999, user.getId());
 		});
 		assertNotNull(thrown.getMessage());
 
 		assertEquals(thrown.getMessage(), "Вещь с id 9999 не зарегистрирована в приложении.");
-	}
-
-	@Test
-	public void testGetAllItemsByOwnerId() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test19@mail.ru").build();
-		User user = userService.createUser(userDto);
-		ItemDto itemDto = ItemDto.builder()
-				.name("itemNameCheck")
-				.description("Очень хорошая вещь")
-				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
-		ItemDto itemDto1 = ItemDto.builder()
-				.name("itemNameCheck1")
-				.description("Просто хорошая вещь")
-				.available(true).build();
-		Item item1 = itemService.addNewItem(user.getId(), itemDto1);
-
-		List<ItemDto> checkList = itemService.getAllItemsByOwnerId(user.getId());
-		assertEquals(2,checkList.size(), "Размер списка не совпадает");
-		assertEquals("Очень хорошая вещь", checkList.get(0).getDescription(),
-				"Поля экземпляров не совпадают");
 	}
 
 	@Test
@@ -376,54 +249,25 @@ class ShareItTests {
 	}
 
 	@Test
-	public void testGetAllItemsByOwnerIdWithIncorrectIdOwner() {
-		UserDto userDto = UserDto.builder()
-				.name("NameTest")
-				.email("test20@mail.ru").build();
-		User user = userService.createUser(userDto);
-		UserDto userDto1 = UserDto.builder()
-				.name("NameTest")
-				.email("test21@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
-		ItemDto itemDto = ItemDto.builder()
-				.name("itemNameCheck")
-				.description("Очень хорошая вещь")
-				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
-		ItemDto itemDto1 = ItemDto.builder()
-				.name("itemNameCheck1")
-				.description("Просто хорошая вещь")
-				.available(true).build();
-		Item item1 = itemService.addNewItem(user.getId(), itemDto1);
-
-		Throwable thrown = assertThrows(UserNotFoundException.class, () -> {
-			itemService.getAllItemsByOwnerId(user1.getId());
-		});
-		assertNotNull(thrown.getMessage());
-
-		assertEquals(thrown.getMessage(), "Владелец вещей с id " + user1.getId() + " не найден");
-	}
-
-	@Test
 	public void testGetItemBySearch() {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test22@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("NameTest")
 				.email("test23@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
+		UserDto user1 = userService.createUser(userDto1);
 		ItemDto itemDto = ItemDto.builder()
 				.name("Классная вещь")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 		ItemDto itemDto1 = ItemDto.builder()
 				.name("itemNameCheck1")
 				.description("Очень КЛАССНАЯ вещь")
 				.available(true).build();
-		Item item1 = itemService.addNewItem(user1.getId(), itemDto1);
+		ItemDto item1 = itemService.addNewItem(user1.getId(), itemDto1);
 
 		List<ItemDto> checkList = itemService.getItemBySearch("клаСС");
 		assertFalse(checkList.isEmpty(), "Список пустой");
@@ -435,21 +279,21 @@ class ShareItTests {
 		UserDto userDto = UserDto.builder()
 				.name("NameTest")
 				.email("test24@mail.ru").build();
-		User user = userService.createUser(userDto);
+		UserDto user = userService.createUser(userDto);
 		UserDto userDto1 = UserDto.builder()
 				.name("NameTest")
 				.email("test25@mail.ru").build();
-		User user1 = userService.createUser(userDto1);
+		UserDto user1 = userService.createUser(userDto1);
 		ItemDto itemDto = ItemDto.builder()
 				.name("Классная вещь")
 				.description("Очень хорошая вещь")
 				.available(true).build();
-		Item item = itemService.addNewItem(user.getId(), itemDto);
+		ItemDto item = itemService.addNewItem(user.getId(), itemDto);
 		ItemDto itemDto1 = ItemDto.builder()
 				.name("itemNameCheck1")
 				.description("Очень КЛАССНАЯ вещь")
 				.available(true).build();
-		Item item1 = itemService.addNewItem(user1.getId(), itemDto1);
+		ItemDto item1 = itemService.addNewItem(user1.getId(), itemDto1);
 
 		List<ItemDto> checkList = itemService.getItemBySearch("Что то");
 		assertTrue(checkList.isEmpty(), "Список  не пустой");

@@ -10,20 +10,20 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-bookings.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Getter
-public class BookingDto {
+public class BookingDtoItem {
     private Long id;
     @NotNull
     @FutureOrPresent
     private LocalDateTime start;
     @NotNull
     private LocalDateTime end;
+    @NotNull
+    @PositiveOrZero
+    private long bookerId;
     @NotNull
     @PositiveOrZero
     private long itemId;
