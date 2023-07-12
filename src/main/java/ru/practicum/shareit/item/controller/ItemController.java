@@ -73,8 +73,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoBooking> getAllItemsByOwnerId(@RequestHeader(Constant.CONSTANT_HEADER) Long userId) {
-        List<ItemDtoBooking> resultList = itemService.getAllItemsByOwnerId(userId);
+    public List<ItemDtoBooking> getAllItemsByOwnerId(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+                                                     @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                     @RequestParam(defaultValue = "20", required = false) Integer size) {
+        List<ItemDtoBooking> resultList = itemService.getAllItemsByOwnerId(userId, from, size);
         if (resultList != null) {
             log.info("Пользователем с id {} запрошен список своих вещей. Данные получены", userId);
         } else {
@@ -85,8 +87,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemBySearch(@RequestParam(name = "text") @NotBlank String text) {
-        List<ItemDto> resultList = itemService.getItemBySearch(text);
+    public List<ItemDto> getItemBySearch(@RequestParam(name = "text") @NotBlank String text,
+                                         @RequestParam(defaultValue = "0", required = false) Integer from,
+                                         @RequestParam(defaultValue = "20", required = false) Integer size) {
+        List<ItemDto> resultList = itemService.getItemBySearch(text, from, size);
         if (resultList != null) {
             log.info("Запрошен список вещей, содержащих в названии или описании - {}. Данные получены", text);
         } else {

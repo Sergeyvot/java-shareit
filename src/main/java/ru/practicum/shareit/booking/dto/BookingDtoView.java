@@ -28,4 +28,16 @@ public class BookingDtoView {
     private Item item;
     @NotNull
     private String status;
+
+    @Override
+    public String toString() {
+        return "BookingDtoView{" +
+                "id=" + id +
+                ", start=" + start +
+                ", end=" + end +
+                ", booker=" + booker +
+                ", item=" + item +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

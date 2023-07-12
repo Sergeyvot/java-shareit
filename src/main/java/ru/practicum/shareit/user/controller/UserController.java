@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -19,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDto> findAllUsers() {
-        Collection<UserDto> resultList = userService.findAllUsers();
+    public List<UserDto> findAllUsers() {
+        List<UserDto> resultList = userService.findAllUsers();
         if (resultList != null) {
             log.info("Запрошен список всех пользователей приложения. Данные получены");
         } else {
@@ -60,16 +60,17 @@ public class UserController {
         } else {
             log.info("Обновление данных пользователя с id {} не выполнено. Необходимо определить ошибку", userId);
         }
-        return userService.updateUser(userId, userDto);
+        return result;
     }
 
-    @DeleteMapping("/{id}")
-    public void removeUser(@PathVariable("id") long id) {
-        userService.removeUser(id);
-    }
-
-    @DeleteMapping
-    public void deleteAllUsers() {
-        userService.deleteAllUsers();
+    @DeleteMapping("/{userId}")
+    public UserDto deleteUser(@PathVariable("userId") long userId) {
+        UserDto result = userService.removeUser(userId);
+        if (result != null) {
+            log.info("Удален пользователь с id {}", userId);
+        } else {
+            log.info("Удаление данных пользователя с id {} не выполнено. Необходимо определить ошибку", userId);
+        }
+        return result;
     }
 }

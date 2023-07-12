@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingDtoItemMapper;
 import ru.practicum.shareit.booking.Status;
@@ -12,6 +14,7 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.CommentMapperUtil;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemMapperUtil;
 import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -19,6 +22,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoBooking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -41,12 +46,15 @@ public class ItemServiceImpl implements ItemService {
     private final UserMapper userMapper;
     private final ItemMapper itemMapper;
     private final BookingDtoItemMapper bookingDtoItemMapper;
+    private final ItemRequestService requestService;
 
     @Override
     public ItemDto addNewItem(long userId, ItemDto itemDto) {
         checkValidationItem(itemDto);
         User user = userMapper.toUser(userService.findUserById(userId));
-        Item item = itemMapper.toItem(itemDto);
+        ItemRequest itemRequest = itemDto.getRequestId() != null ?
+                requestService.findEntityById(itemDto.getRequestId()) : null;
+        Item item = ItemMapperUtil.toItem(itemDto, itemRequest);
         Item newItem = item.toBuilder()
                 .owner(user).build();
         log.info("В приложение добавлена вещь {}", itemDto.getName());
@@ -139,9 +147,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoBooking> getAllItemsByOwnerId(long userId) {
+    public List<ItemDtoBooking> getAllItemsByOwnerId(long userId, Integer from, Integer size) {
         User user = userMapper.toUser(userService.findUserById(userId));
-        return repository.findAllByOwnerId(userId).stream()
+        checkPaginationParams(from, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
+        return repository.findAllByOwnerId(userId, pageable)
+                .stream()
                 .map(i -> ItemDtoBooking.builder()
                         .id(i.getId())
                         .name(i.getName())
@@ -164,12 +175,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemBySearch(String text) {
+    public List<ItemDto> getItemBySearch(String text, Integer from, Integer size) {
         log.info(String.format("Запрошен список вещей, содержащих в названии или описании - %s.", text));
         if (StringUtils.isBlank(text)) {
             return new ArrayList<>();
         }
-        return repository.search(text).stream()
+        checkPaginationParams(from, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
+        return repository.search(text, pageable)
+                .stream()
                 .filter(Item::isAvailable)
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -193,6 +207,13 @@ public class ItemServiceImpl implements ItemService {
             log.error("Доступность вещи не указана");
             throw new ValidationException("При создании вещи должна быть указана ее доступность. "
                     + "Поле не может быть пустым");
+        }
+    }
+
+    private void checkPaginationParams(Integer from, Integer size) {
+        if (from < 0 || size < 0 || (from.equals(0) && size.equals(0))) {
+            log.error("Переданы некорректные параметры постраничного вывода");
+            throw new ValidationException("Переданы некорректные параметры постраничного вывода");
         }
     }
 }

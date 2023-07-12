@@ -27,6 +27,5 @@ public class BookingDto {
     @NotNull
     @PositiveOrZero
     private long itemId;
-    @NotNull
     private String status;
 }

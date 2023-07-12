@@ -240,7 +240,7 @@ class ShareItTests {
 	@Test
 	public void testGetAllItemsByOwnerIdWithIncorrectId() {
 		Throwable thrown = assertThrows(UserNotFoundException.class, () -> {
-			itemService.getAllItemsByOwnerId(9999);
+			itemService.getAllItemsByOwnerId(9999, 0, 20);
 		});
 		assertNotNull(thrown.getMessage());
 
@@ -269,7 +269,7 @@ class ShareItTests {
 				.available(true).build();
 		ItemDto item1 = itemService.addNewItem(user1.getId(), itemDto1);
 
-		List<ItemDto> checkList = itemService.getItemBySearch("клаСС");
+		List<ItemDto> checkList = itemService.getItemBySearch("клаСС", 0, 20);
 		assertFalse(checkList.isEmpty(), "Список пустой");
 		assertEquals(2,checkList.size(), "Размер списка не совпадает");
 	}
@@ -295,7 +295,7 @@ class ShareItTests {
 				.available(true).build();
 		ItemDto item1 = itemService.addNewItem(user1.getId(), itemDto1);
 
-		List<ItemDto> checkList = itemService.getItemBySearch("Что то");
+		List<ItemDto> checkList = itemService.getItemBySearch("Что то", 0, 20);
 		assertTrue(checkList.isEmpty(), "Список  не пустой");
 	}
 }

@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 @Getter
 public class ItemDto {
     @PositiveOrZero
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
     @Size(max = 1000)

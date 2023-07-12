@@ -70,15 +70,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void removeUser(long id) {
-        repository.deleteById(id);
-        log.info("Удален пользователь с id {}", id);
-    }
-
-    @Override
-    public void deleteAllUsers() {
-        repository.deleteAll();
-        log.info("Удалены все пользователи приложения");
+    public UserDto removeUser(long userId) {
+        UserDto user = this.findUserById(userId);
+        if (user != null) {
+            repository.deleteById(userId);
+        } else {
+            log.error("Передан некорректный id пользователя: {}", userId);
+            throw new UserNotFoundException(String.format("Пользователь с id %d не зарегистрирован "
+                    + "в базе приложения.", userId));
+        }
+        return user;
     }
 
     private void checkValidationUser(UserDto userDto) throws ValidationException {
