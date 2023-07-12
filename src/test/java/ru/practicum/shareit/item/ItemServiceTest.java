@@ -38,6 +38,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -489,13 +490,19 @@ public class ItemServiceTest {
         Mockito
                 .when(mockItemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.of(new Item(1L, "Отвертка", "Крестовая отвертка", true,
-                        new User(2L, "NameTest", "test@mail.ru"), null)));
+                        new User(1L, "NameTest", "test@mail.ru"), null)));
         Mockito
                 .when(mockBookingRepository.findByItemIdOrderByEndDesc(Mockito.anyLong(), Mockito.any()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Arrays.asList(new Booking(1L, Instant.now().minusSeconds(1000),
+                        Instant.now().minusSeconds(500), new Item(1L, "Отвертка", "Крестовая отвертка", true,
+                        new User(1L, "NameTest", "test@mail.ru"), null),
+                        new User(3L, "Booker", "Booker@mail.ru"), Status.APPROVED)));
         Mockito
                 .when(mockBookingRepository.findByItemIdOrderByStartAsc(Mockito.anyLong(), Mockito.any()))
-                .thenReturn(new ArrayList<>());
+                .thenReturn(Arrays.asList(new Booking(2L, Instant.now().plusSeconds(500),
+                        Instant.now().plusSeconds(1500), new Item(1L, "Отвертка", "Крестовая отвертка", true,
+                        new User(1L, "NameTest", "test@mail.ru"), null),
+                        new User(3L, "Booker", "Booker@mail.ru"), Status.APPROVED)));
         Mockito
                 .when(mockCommentRepository.findAllByItemId(Mockito.anyLong()))
                 .thenReturn(new ArrayList<>());
@@ -506,8 +513,8 @@ public class ItemServiceTest {
         Assertions.assertEquals("Крестовая отвертка", itemDtoBooking.getDescription(),
                 "Поля объектов не совпадают");
         Assertions.assertEquals(true, itemDtoBooking.getAvailable(), "Поля объектов не совпадают");
-        Assertions.assertNull(itemDtoBooking.getLastBooking(), "Поля объектов не совпадают");
-        Assertions.assertNull(itemDtoBooking.getNextBooking(), "Поля объектов не совпадают");
+        Assertions.assertEquals(1L, itemDtoBooking.getLastBooking().getId(), "Поля объектов не совпадают");
+        Assertions.assertEquals(2L, itemDtoBooking.getNextBooking().getId(), "Поля объектов не совпадают");
         Assertions.assertTrue(itemDtoBooking.getComments().isEmpty(), "Поля объектов не совпадают");
     }
 
