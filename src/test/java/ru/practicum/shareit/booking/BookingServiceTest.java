@@ -131,9 +131,10 @@ public class BookingServiceTest {
 
     @Test
     void testAddNewBookingWhenEndDateTimeEqualToStartDateTime() {
+        LocalDateTime checkTime = LocalDateTime.now().plusSeconds(1000);
         BookingDto bookingDto = BookingDto.builder()
-                .start(LocalDateTime.now().plusSeconds(1000))
-                .end(LocalDateTime.now().plusSeconds(1000))
+                .start(checkTime)
+                .end(checkTime)
                 .itemId(1L).build();
 
         final ValidationException exception = Assertions.assertThrows(
