@@ -18,8 +18,8 @@ public final class ItemMapperUtil {
         }
         item.name(itemDto.getName());
         item.description(itemDto.getDescription());
-        if ( itemDto.getAvailable() != null ) {
-            item.available( itemDto.getAvailable() );
+        if (itemDto.getAvailable() != null) {
+            item.available(itemDto.getAvailable());
         }
         if (itemRequest != null) {
             item.request(itemRequest);
