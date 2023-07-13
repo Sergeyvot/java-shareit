@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.Constant;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -40,6 +39,7 @@ public class ItemControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
+    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final ItemDto itemDto = new ItemDto(1L, "Отвертка",
             "Крестовая отвертка", true, null);
@@ -71,7 +71,7 @@ public class ItemControllerTest {
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
@@ -90,7 +90,7 @@ public class ItemControllerTest {
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemDto.getId()), Long.class))
@@ -109,7 +109,7 @@ public class ItemControllerTest {
                         .content(mapper.writeValueAsString(itemDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemDtoBooking.getId()), Long.class))
@@ -144,7 +144,7 @@ public class ItemControllerTest {
                         .content(mapper.writeValueAsString(commentDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(commentDto.getId()), Long.class))
@@ -161,7 +161,7 @@ public class ItemControllerTest {
         mvc.perform(get("/items?from=0&size=5")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -183,7 +183,7 @@ public class ItemControllerTest {
         mvc.perform(get("/items/search?text=оТверТ&from=0&size=5")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))

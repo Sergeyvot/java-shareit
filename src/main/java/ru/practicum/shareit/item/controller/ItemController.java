@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Constant;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoBooking;
@@ -21,9 +20,10 @@ import java.util.List;
 @Slf4j
 public class ItemController {
     private final ItemService itemService;
+    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto addNewItem(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public ItemDto addNewItem(@RequestHeader(CONSTANT_HEADER) Long userId,
                               @RequestBody ItemDto itemDto) {
         ItemDto result = itemService.addNewItem(userId, itemDto);
         if (result != null) {
@@ -35,7 +35,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addNewComment(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public CommentDto addNewComment(@RequestHeader(CONSTANT_HEADER) Long userId,
                                  @PathVariable long itemId,
                                  @RequestBody CommentDto commentDto) {
         CommentDto result = itemService.addNewComment(userId, itemId, commentDto);
@@ -48,7 +48,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public ItemDto updateItem(@RequestHeader(CONSTANT_HEADER) Long userId,
                               @PathVariable long itemId,
                               @RequestBody ItemDto itemDto) {
         ItemDto result = itemService.updateItem(userId, itemId, itemDto);
@@ -61,7 +61,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDtoBooking findItemById(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public ItemDtoBooking findItemById(@RequestHeader(CONSTANT_HEADER) Long userId,
                                        @PathVariable long itemId) {
         ItemDtoBooking result = itemService.findItemById(itemId, userId);
         if (result != null) {
@@ -73,7 +73,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoBooking> getAllItemsByOwnerId(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public List<ItemDtoBooking> getAllItemsByOwnerId(@RequestHeader(CONSTANT_HEADER) Long userId,
                                                      @RequestParam(defaultValue = "0", required = false) Integer from,
                                                      @RequestParam(defaultValue = "20", required = false) Integer size) {
         List<ItemDtoBooking> resultList = itemService.getAllItemsByOwnerId(userId, from, size);

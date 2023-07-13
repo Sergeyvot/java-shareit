@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.Constant;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDtoView;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -39,6 +38,7 @@ public class BookingControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
+    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final BookingDtoView bookingDtoView = new BookingDtoView(1L,
             LocalDateTime.of(2023, Month.JULY, 10, 12, 30, 30),
@@ -70,7 +70,7 @@ public class BookingControllerTest {
                         .content(mapper.writeValueAsString(bookingDtoView))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDtoView.getId()), Long.class))
@@ -90,7 +90,7 @@ public class BookingControllerTest {
                         .content(mapper.writeValueAsString(bookingDtoView))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDtoView.getId()), Long.class))
@@ -110,7 +110,7 @@ public class BookingControllerTest {
                         .content(mapper.writeValueAsString(bookingDtoView))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(bookingDtoView.getId()), Long.class))
@@ -142,7 +142,7 @@ public class BookingControllerTest {
         mvc.perform(get("/bookings?state=ALL&from=0&size=5")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -164,7 +164,7 @@ public class BookingControllerTest {
         mvc.perform(get("/bookings/owner?state=ALL&from=0&size=5")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))

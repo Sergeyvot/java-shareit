@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.Constant;
 import ru.practicum.shareit.request.controller.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoView;
@@ -38,6 +37,7 @@ public class ItemRequestControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
+    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "Нужна отвертка",
             LocalDateTime.of(2023, Month.JULY, 10, 12, 30, 30));
@@ -62,7 +62,7 @@ public class ItemRequestControllerTest {
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDto.getId()), Long.class))
@@ -78,7 +78,7 @@ public class ItemRequestControllerTest {
         mvc.perform(get("/requests")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -100,7 +100,7 @@ public class ItemRequestControllerTest {
         mvc.perform(get("/requests/1")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(itemRequestDtoView.getId()), Long.class))
@@ -129,7 +129,7 @@ public class ItemRequestControllerTest {
         mvc.perform(get("/requests/all")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(Constant.CONSTANT_HEADER, 1L)
+                        .header(CONSTANT_HEADER, 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
