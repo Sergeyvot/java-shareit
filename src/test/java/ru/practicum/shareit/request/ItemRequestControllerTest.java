@@ -37,7 +37,7 @@ public class ItemRequestControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "Нужна отвертка",
             LocalDateTime.of(2023, Month.JULY, 10, 12, 30, 30));

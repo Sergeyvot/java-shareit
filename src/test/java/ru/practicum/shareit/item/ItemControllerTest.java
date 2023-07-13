@@ -39,7 +39,7 @@ public class ItemControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final ItemDto itemDto = new ItemDto(1L, "Отвертка",
             "Крестовая отвертка", true, null);

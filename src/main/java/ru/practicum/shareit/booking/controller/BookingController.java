@@ -20,7 +20,7 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public BookingDtoView createNewBooking(@RequestHeader(CONSTANT_HEADER) Long userId,

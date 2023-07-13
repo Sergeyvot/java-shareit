@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 public class ItemController {
     private final ItemService itemService;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public ItemDto addNewItem(@RequestHeader(CONSTANT_HEADER) Long userId,

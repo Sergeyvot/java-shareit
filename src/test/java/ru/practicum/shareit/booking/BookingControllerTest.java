@@ -38,7 +38,7 @@ public class BookingControllerTest {
     ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     private final BookingDtoView bookingDtoView = new BookingDtoView(1L,
             LocalDateTime.of(2023, Month.JULY, 10, 12, 30, 30),

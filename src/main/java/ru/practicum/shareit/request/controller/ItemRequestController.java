@@ -19,7 +19,7 @@ import java.util.List;
 public class ItemRequestController {
 
     private final ItemRequestService itemRequestService;
-    private final String CONSTANT_HEADER = "X-Sharer-User-Id";
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public ItemRequestDto addNewRequest(@RequestHeader(CONSTANT_HEADER) Long userId,
