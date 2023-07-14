@@ -6,11 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.Collection;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -19,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> findAllUsers() {
+    public Collection<UserDto> findAllUsers() {
         List<UserDto> resultList = userService.findAllUsers();
         if (resultList != null) {
             log.info("Запрошен список всех пользователей приложения. Данные получены");
