@@ -4,7 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * TODO Sprint add-item-requests.
@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String description;
-    @ManyToOne(fetch = FetchType.LAZY)
+    private Long id;
+    private String description;
+    @ManyToOne
     @JoinColumn(name = "requestor_id")
     @ToString.Exclude
-    User requestor;
-    LocalDateTime created;
+    private User requestor;
+    private Instant created;
 }

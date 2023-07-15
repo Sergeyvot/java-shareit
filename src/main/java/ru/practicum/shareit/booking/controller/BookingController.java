@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Constant;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoView;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -11,9 +10,6 @@ import ru.practicum.shareit.booking.service.BookingService;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
@@ -21,9 +17,10 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private static final String CONSTANT_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public BookingDtoView createNewBooking(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
+    public BookingDtoView createNewBooking(@RequestHeader(CONSTANT_HEADER) Long userId,
                                            @RequestBody BookingDto bookingDto) {
         BookingDtoView result = bookingService.addNewBooking(userId, bookingDto);
         if (result != null) {
@@ -35,21 +32,21 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDtoView updateApproved(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
-                              @PathVariable long bookingId,
-                              @RequestParam(name = "approved") @NotBlank Boolean approved) {
+    public BookingDtoView updateApproved(@RequestHeader(CONSTANT_HEADER) Long userId,
+                                         @PathVariable long bookingId,
+                                         @RequestParam(name = "approved") @NotBlank Boolean approved) {
         BookingDtoView result = bookingService.updateApproved(userId, bookingId, approved);
         if (result != null) {
             log.info("Изменена доступность бронирование с id {}", bookingId);
         } else {
             log.info("Доступность бронирования с id {} изменить не удалось", bookingId);
         }
-            return result;
+        return result;
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDtoView getBookingById(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
-                                        @PathVariable long bookingId) {
+    public BookingDtoView getBookingById(@RequestHeader(CONSTANT_HEADER) Long userId,
+                                         @PathVariable long bookingId) {
         BookingDtoView result = bookingService.getBookingById(bookingId, userId);
         if (result != null) {
             log.info("Запрошено бронирование с id {}. Данные получены", bookingId);
@@ -60,10 +57,11 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoView> getAllBookingsByBookerId(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
-                                     @RequestParam(defaultValue = "ALL", required = false,
-                                             name = "state") String state) {
-        List<BookingDtoView> resultList = bookingService.getAllBookingsByBookerId(userId, state);
+    public List<BookingDtoView> getAllBookingsByBookerId(@RequestHeader(CONSTANT_HEADER) Long userId,
+                                                         @RequestParam(defaultValue = "ALL", required = false) String state,
+                                                         @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                         @RequestParam(defaultValue = "20", required = false) Integer size) {
+        List<BookingDtoView> resultList = bookingService.getAllBookingsByBookerId(userId, state, from, size);
         if (resultList != null) {
             log.info("Пользователем с id {} запрошен список своих бронирований. Данные получены", userId);
         } else {
@@ -74,15 +72,16 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoView> getAllBookingsByOwnerId(@RequestHeader(Constant.CONSTANT_HEADER) Long userId,
-                                                     @RequestParam(defaultValue = "ALL", required = false,
-                                                             name = "state") String state) {
-        List<BookingDtoView> resultList = bookingService.getAllBookingsByOwnerId(userId, state);
+    public List<BookingDtoView> getAllBookingsByOwnerId(@RequestHeader(CONSTANT_HEADER) Long userId,
+                                                        @RequestParam(defaultValue = "ALL", required = false) String state,
+                                                        @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                        @RequestParam(defaultValue = "20", required = false) Integer size) {
+        List<BookingDtoView> resultList = bookingService.getAllBookingsByOwnerId(userId, state, from, size);
         if (resultList != null) {
             log.info("Пользователем с id {} запрошен список бронирований своих вещей. Данные получены", userId);
         } else {
             log.info("Запрос списка бронирований своих вещей пользователем с id {} не выполнен. " +
-                            "Необходимо определить ошибку", userId);
+                    "Необходимо определить ошибку", userId);
         }
         return resultList;
     }

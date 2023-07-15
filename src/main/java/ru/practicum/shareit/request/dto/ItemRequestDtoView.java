@@ -4,24 +4,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Getter
-public class ItemRequestDto {
+public class ItemRequestDtoView {
     @PositiveOrZero
-    private Long id;
+    private long id;
     @NotNull
     @Size(max = 1000)
     private String description;
     private LocalDateTime created;
+    private List<ItemDto> items;
 }

@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.*;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -65,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoView updateApproved(Long userId, Long bookingId, Boolean approved) {
         User user = userMapper.toUser(userService.findUserById(userId));
         Booking booking = repository.findById(bookingId)
-                .orElseThrow(() -> new BookingNotFoundException(String.format("<Бронирование с id %d не зарегистрировано "
+                .orElseThrow(() -> new BookingNotFoundException(String.format("Бронирование с id %d не зарегистрировано "
                         + "в базе приложения.", bookingId)));
         if (booking.getStatus().equals(Status.APPROVED) && approved) {
             log.error("Бронирование вещи с id {} уже подтверждено", booking.getItem().getId());
@@ -102,33 +104,42 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoView> getAllBookingsByBookerId(Long userId, String state) {
+    public List<BookingDtoView> getAllBookingsByBookerId(Long userId, String state, Integer from, Integer size) {
         userService.findUserById(userId);
+        checkPaginationParams(from, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
+
         switch (State.getEnum(state)) {
             case WAITING:
-                return repository.findByBookerIdAndByStatus(userId, "WAITING").stream()
+                return repository.findByBookerIdAndByStatus(userId, "WAITING", pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case REJECTED:
-                return repository.findByBookerIdAndByStatus(userId, "REJECTED").stream()
+                return repository.findByBookerIdAndByStatus(userId, "REJECTED", pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case ALL:
-                return repository.findByBookerId(userId).stream()
+                return repository.findByBookerId(userId, pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case CURRENT:
-                return repository.findByBookerId(userId).stream()
+                return repository.findByBookerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getStart().isBefore(Instant.now()) && b.getEnd().isAfter(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case FUTURE:
-                return repository.findByBookerId(userId).stream()
+                return repository.findByBookerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getStart().isAfter(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case PAST:
-                return repository.findByBookerId(userId).stream()
+                return repository.findByBookerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getEnd().isBefore(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
@@ -138,39 +149,54 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoView> getAllBookingsByOwnerId(Long userId, String state) {
+    public List<BookingDtoView> getAllBookingsByOwnerId(Long userId, String state, Integer from, Integer size) {
         userService.findUserById(userId);
+        checkPaginationParams(from, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
 
         switch (State.getEnum(state)) {
             case WAITING:
-                return repository.findAllByOwner_IdByStatus(userId, "WAITING").stream()
+                return repository.findAllByOwner_IdByStatus(userId, "WAITING", pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case REJECTED:
-                return repository.findAllByOwner_IdByStatus(userId, "REJECTED").stream()
+                return repository.findAllByOwner_IdByStatus(userId, "REJECTED", pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case ALL:
-                return repository.findAllByOwnerId(userId).stream()
+                return repository.findAllByOwnerId(userId, pageable)
+                        .stream()
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case CURRENT:
-                return repository.findAllByOwnerId(userId).stream()
+                return repository.findAllByOwnerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getStart().isBefore(Instant.now()) && b.getEnd().isAfter(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case FUTURE:
-                return repository.findAllByOwnerId(userId).stream()
+                return repository.findAllByOwnerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getStart().isAfter(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             case PAST:
-                return repository.findAllByOwnerId(userId).stream()
+                return repository.findAllByOwnerId(userId, pageable)
+                        .stream()
                         .filter(b -> b.getEnd().isBefore(Instant.now()))
                         .map(bookingDtoViewMapper::toBookingDtoView)
                         .collect(Collectors.toList());
             default:
                 throw new ParameterStateException("Unknown state: " + state);
+        }
+    }
+
+    private void checkPaginationParams(Integer from, Integer size) {
+        if (from < 0 || size < 0 || (from.equals(0) && size.equals(0))) {
+            log.error("Переданы некорректные параметры постраничного вывода");
+            throw new ValidationException("Переданы некорректные параметры постраничного вывода");
         }
     }
 }

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.dao;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -23,18 +25,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select b.* from bookings as b " +
             "where b.booker_id = ?1 and b.status = concat('', ?2, '') order by b.start_date desc", nativeQuery = true)
-    List<Booking> findByBookerIdAndByStatus(Long userId, String status);
+    Page<Booking> findByBookerIdAndByStatus(Long userId, String status, Pageable pageable);
 
     @Query(" select b from Booking as b " +
             "where b.booker.id = ?1 order by b.start desc")
-    List<Booking> findByBookerId(Long userId);
+    Page<Booking> findByBookerId(Long userId, Pageable pageable);
 
     @Query(value = "select b.* from bookings as b " +
             "left join items as it on b.item_id = it.id " +
             "where it.owner_id = ?1 and b.status = concat('', ?2, '') order by b.start_date desc", nativeQuery = true)
-    List<Booking> findAllByOwner_IdByStatus(Long userId, String status);
+    Page<Booking> findAllByOwner_IdByStatus(Long userId, String status, Pageable pageable);
 
     @Query(" select b from Booking b " +
             "where b.item.owner.id =  ?1 order by b.start desc")
-    List<Booking> findAllByOwnerId(Long userId);
+    Page<Booking> findAllByOwnerId(Long userId, Pageable pageable);
 }

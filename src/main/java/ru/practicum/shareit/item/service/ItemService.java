@@ -19,7 +19,7 @@ public interface ItemService {
 
     Item findEntityById(long itemId);
 
-    List<ItemDtoBooking> getAllItemsByOwnerId(long userId);
+    List<ItemDtoBooking> getAllItemsByOwnerId(long userId, Integer from, Integer size);
 
-    List<ItemDto> getItemBySearch(String text);
+    List<ItemDto> getItemBySearch(String text, Integer from, Integer size);
 }
