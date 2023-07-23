@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  gateway:
+    build: gateway
+    image: shareit_gateway_image
+    container_name: shareit_gateway_container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      - SHAREIT_SERVER_URL=http://server:9090
+     # - TZ=Europe/Saratov
+
+  server:
+    build: server
+    image: shareit_server_image
+    container_name: shareit_server_container
+    ports:
+      - "9090:9090"
