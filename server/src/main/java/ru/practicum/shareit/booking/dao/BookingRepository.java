@@ -41,6 +41,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findAllByOwner_IdByStatus(Long userId, String status, Pageable pageable);
 
     @Query(" select b from Booking b " +
-            "where b.item.owner.id =  ?1 order by b.start desc")
+            "where b.item.owner.id = ?1 order by b.start desc")
     Page<Booking> findAllByOwnerId(Long userId, Pageable pageable);
 }
