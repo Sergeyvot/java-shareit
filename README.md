@@ -1,6 +1,6 @@
 # ShareIt (учебный проект)
 
-![Изображение](https://www.vesti.ru/p/b_1322240.jpg)
+![Изображение](https://s3.amazonaws.com/offlinepost/wp-media-folder-offlinepost/wp-content/uploads/2021/06/air2-652x420.png)
 
 ## Функциональность
 
